@@ -25,6 +25,7 @@ using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using Rock.Lava;
+using Rock.Lava.Filters;
 using Rock.Lava.Fluid;
 using Rock.Model;
 using Rock.Utility;
@@ -173,7 +174,7 @@ namespace Rock.Tests.Shared.Lava
         {
             // Register the common Rock.Lava filters first, then overwrite with the web-specific filters.
             engine.RegisterFilters( typeof( global::Rock.Lava.Filters.TemplateFilters ) );
-            engine.RegisterFilters( typeof( Rock.Lava.LavaFilters ) );
+            engine.RegisterFilters( typeof( LavaFilters ) );
         }
 
         private static void RegisterTags( ILavaEngine engine )

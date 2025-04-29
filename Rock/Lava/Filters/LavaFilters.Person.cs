@@ -14,45 +14,24 @@
 // limitations under the License.
 // </copyright>
 //
+
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Collections.Specialized;
 using System.Data.Entity;
 using System.Drawing;
 using System.Drawing.Imaging;
-using System.Dynamic;
 using System.IO;
 using System.Linq;
-using System.Linq.Dynamic.Core;
-using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Web;
-using System.Web.UI;
-using System.Web.UI.HtmlControls;
-using Humanizer;
-using Humanizer.Localisation;
-using Ical.Net;
-using ImageResizer;
-using Rock;
-using Rock.Attribute;
-using Rock.Cms.StructuredContent;
-using Rock.Data;
-using Rock.Enums.Core;
-using Rock.Logging;
-using Rock.Model;
-using Rock.Security;
-using Rock.Utilities;
-using Rock.Utility;
-using Rock.Web;
-using Rock.Web.Cache;
-using Rock.Web.UI;
-using Rock.Web.UI.Controls;
-using UAParser;
 
-namespace Rock.Lava
+using Rock.Data;
+using Rock.Model;
+using Rock.Web.Cache;
+
+namespace Rock.Lava.Filters
 {
     /// <summary>
     /// Defines filter methods available for use with the Lava library.

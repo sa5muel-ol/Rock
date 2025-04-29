@@ -48,6 +48,7 @@ using Rock.Cms.StructuredContent;
 using Rock.Configuration;
 using Rock.Data;
 using Rock.Lava.DotLiquid;
+using Rock.Lava.Filters;
 using Rock.Logging;
 using Rock.Model;
 using Rock.Security;

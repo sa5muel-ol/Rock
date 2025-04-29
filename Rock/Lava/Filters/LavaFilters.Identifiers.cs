@@ -14,13 +14,14 @@
 // limitations under the License.
 // </copyright>
 //
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
 using Rock.Web.Cache;
 
-namespace Rock.Lava
+namespace Rock.Lava.Filters
 {
     /// <summary>
     /// Defines filter methods available for use with the Lava library.

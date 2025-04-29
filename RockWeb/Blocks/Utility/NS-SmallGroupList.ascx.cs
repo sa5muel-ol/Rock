@@ -19,14 +19,12 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data.Entity;
 using System.Linq;
-using System.Web.UI;
 using System.Web.UI.HtmlControls;
 using System.Web.UI.WebControls;
 
 using Rock;
 using Rock.Attribute;
 using Rock.Data;
-using Rock.Lava;
 using Rock.Model;
 using Rock.Security;
 using Rock.Utility;
@@ -35,14 +33,13 @@ using Rock.Web.Cache;
 using Rock.Web.UI;
 using Rock.Web.UI.Controls;
 
-namespace RockWeb.Blocks.Groups
+namespace Blocks.Utility
 {
-    [DisplayName( "Group List" )]
-    [Category( "Groups" )]
-    [Description( "Lists all groups for the configured group types or all groups for the specified person context. Query string parameters: <ul><li>GroupTypeId - Filters to a specific group type.</li></ui>" )]
+    [DisplayName( "Small Group List" )]
+    [Category( "Small Groups" )]
+    [Description( "Lists all small groups for the configured group types or all groups for the specified person context. Query string parameters: <ul><li>GroupTypeId - Filters to a specific group type.</li></ui>" )]
 
-    [LinkedPage( "Detail Page", "", true, "", "", 0 )]
-    [GroupTypesField( "Include Group Types", "The group types to display in the list.  If none are selected, all group types will be included.", false, "", "", 1 )]
+    [LinkedPage( AttributeKey.DetailPage, "", true, "", "", 0 )]
 
     [BooleanField(
         "Limit to Security Role Groups",
@@ -51,7 +48,6 @@ namespace RockWeb.Blocks.Groups
         DefaultBooleanValue = false,
         Order = 2 )]
 
-    [GroupTypesField( "Exclude Group Types", "The group types to exclude from the list (only valid if including all groups).", false, "", "", 3 )]
     [BooleanField( "Display Group Path", "Should the Group path be displayed?", false, "", 4 )]
     [BooleanField( "Display Group Type Column", "Should the Group Type column be displayed?", true, "", 5 )]
     [BooleanField( "Display Description Column", "Should the Description column be displayed?", true, "", 6 )]
@@ -79,8 +75,8 @@ namespace RockWeb.Blocks.Groups
         Order = 17,
         Key = AttributeKey.RootGroup )]
     [ContextAware]
-    [Rock.SystemGuid.BlockTypeGuid( "3D7FB6BE-6BBD-49F7-96B4-96310AF3048A" )]
-    public partial class GroupList : RockBlock, ICustomGridColumns
+    [Rock.SystemGuid.BlockTypeGuid( "DAF58B88-2F9B-4B6B-928D-23C4F1A2B3C4" )]
+    public partial class SmallGroupList : RockBlock, ICustomGridColumns
     {
         private int _groupTypesCount = 0;
         private bool _showGroupPath = false;
@@ -116,6 +112,7 @@ namespace RockWeb.Blocks.Groups
         /// </summary>
         private static class AttributeKey
         {
+            public const string DetailPage = "DetailPage";
             public const string GroupPickerType = "GroupPickerType";
             public const string RootGroup = "RootGroup";
             public const string LimittoSecurityRoleGroups = "LimittoSecurityRoleGroups";
@@ -136,12 +133,15 @@ namespace RockWeb.Blocks.Groups
 
             ApplyBlockSettings();
 
+            // Enable navigation to a details page
+            // gSmallGroups.Actions.ShowSelect = true;
+
             modalDetails.SaveClick += modalDetails_SaveClick;
 
             this.BlockUpdated += GroupList_BlockUpdated;
             this.AddConfigurationUpdateTrigger( upnlGroupList );
 
-            SecurityField securityField = gGroups.Columns.OfType<SecurityField>().FirstOrDefault();
+            SecurityField securityField = gSmallGroups.Columns.OfType<SecurityField>().FirstOrDefault();
             if (securityField != null) securityField.EntityTypeId = EntityTypeCache.Get(typeof(Rock.Model.Group)).Id;
         }
 
@@ -171,11 +171,11 @@ namespace RockWeb.Blocks.Groups
             // only show the user active filter if the block setting doesn't already restrict it
             ddlActiveFilter.Visible = GetAttributeValue( "LimittoActiveStatus" ) == "all";
 
-            gGroups.DataKeyNames = new string[] { "Id" };
-            gGroups.Actions.AddClick += gGroups_Add;
-            gGroups.GridRebind += gGroups_GridRebind;
-            gGroups.ExportSource = ExcelExportSource.DataSource;
-            gGroups.ShowConfirmDeleteDialog = false;
+            gSmallGroups.DataKeyNames = new string [] {"Id"} ;
+            gSmallGroups.Actions.AddClick += gSmallGroups_Add;
+            gSmallGroups.GridRebind += gSmallGroups_GridRebind;
+            gSmallGroups.ExportSource = ExcelExportSource.DataSource;
+            gSmallGroups.ShowConfirmDeleteDialog = false;
 
             // set up Grid based on Block Settings and Context
             bool showDescriptionColumn = GetAttributeValue( "DisplayDescriptionColumn" ).AsBoolean();
@@ -185,26 +185,26 @@ namespace RockWeb.Blocks.Groups
 
             if ( !showDescriptionColumn )
             {
-                gGroups.TooltipField = "Description";
+                gSmallGroups.TooltipField = "Description";
             }
 
             _showGroupPath = GetAttributeValue( "DisplayGroupPath" ).AsBoolean();
 
-            Dictionary<string, BoundField> boundFields = gGroups.Columns.OfType<BoundField>().ToDictionary( a => a.DataField );
+            Dictionary<string, BoundField> boundFields = gSmallGroups.Columns.OfType<BoundField>().ToDictionary( a => a.DataField );
             boundFields["Name"].Visible = !_showGroupPath;
 
             // The GroupPathName field is the RockTemplateField that has a headertext of "Name"
-            var groupPathNameField = gGroups.ColumnsOfType<RockTemplateField>().FirstOrDefault( a => a.HeaderText == "Name" );
+            var groupPathNameField = gSmallGroups.ColumnsOfType<RockTemplateField>().FirstOrDefault( a => a.HeaderText == "Name" );
             groupPathNameField.Visible = _showGroupPath;
 
             boundFields["GroupTypeName"].Visible = GetAttributeValue( "DisplayGroupTypeColumn" ).AsBoolean();
             boundFields["Description"].Visible = showDescriptionColumn;
 
-            Dictionary<string, BoolField> boolFields = gGroups.Columns.OfType<BoolField>().ToDictionary( a => a.DataField );
+            Dictionary<string, BoolField> boolFields = gSmallGroups.Columns.OfType<BoolField>().ToDictionary( a => a.DataField );
             boolFields["IsActive"].Visible = showActiveStatusColumn;
             boolFields["IsSystem"].Visible = showSystemColumn;
 
-            var securityField = gGroups.ColumnsOfType<SecurityField>().FirstOrDefault();
+            var securityField = gSmallGroups.ColumnsOfType<SecurityField>().FirstOrDefault();
             if ( securityField != null )
             {
                 securityField.Visible = showSecurityColumn;
@@ -231,20 +231,20 @@ namespace RockWeb.Blocks.Groups
                     boundFields["GroupRole"].Visible = true;
                     boundFields["DateAdded"].Visible = true;
                     boundFields["MemberCount"].Visible = false;
-                    gGroups.IsDeleteEnabled = true;
-                    gGroups.Actions.ShowAdd = allowAdd;
-                    gGroups.HideDeleteButtonForIsSystem = false;
+                    gSmallGroups.IsDeleteEnabled = true;
+                    gSmallGroups.Actions.ShowAdd = allowAdd;
+                    gSmallGroups.HideDeleteButtonForIsSystem = false;
                 }
 
-                gGroups.DataKeyNames = new string[] { "GroupMemberId" };
+                gSmallGroups.DataKeyNames = new string[] { "GroupMemberId" };
             }
             else
             {
                 // Grid is in normal 'Group List' mode
                 bool canEdit = IsUserAuthorized( Authorization.EDIT );
-                gGroups.Actions.ShowAdd = canEdit && allowAdd;
-                gGroups.IsDeleteEnabled = canEdit;
-                gGroups.DataKeyNames = new string[] { "Id" };
+                gSmallGroups.Actions.ShowAdd = canEdit && allowAdd;
+                gSmallGroups.IsDeleteEnabled = canEdit;
+                gSmallGroups.DataKeyNames = new string[] { "Id" };
 
                 boundFields["GroupRole"].Visible = false;
                 boundFields["DateAdded"].Visible = false;
@@ -259,7 +259,7 @@ namespace RockWeb.Blocks.Groups
         /// </summary>
         /// <param name="sender">The source of the event.</param>
         /// <param name="e">The <see cref="GridViewRowEventArgs"/> instance containing the event data.</param>
-        protected void gGroups_RowDataBound( object sender, GridViewRowEventArgs e )
+        protected void gSmallGroups_RowDataBound( object sender, GridViewRowEventArgs e )
         {
             if ( e.Row.RowType == DataControlRowType.DataRow )
             {
@@ -295,10 +295,10 @@ namespace RockWeb.Blocks.Groups
                     }
                 }
 
-                var deleteOrArchiveField = gGroups.ColumnsOfType<DeleteField>().FirstOrDefault();
+                var deleteOrArchiveField = gSmallGroups.ColumnsOfType<DeleteField>().FirstOrDefault();
                 if ( deleteOrArchiveField != null && deleteOrArchiveField.Visible )
                 {
-                    var deleteFieldColumnIndex = gGroups.GetColumnIndex( deleteOrArchiveField );
+                    var deleteFieldColumnIndex = gSmallGroups.GetColumnIndex( deleteOrArchiveField );
                     var deleteButton = e.Row.Cells[deleteFieldColumnIndex].ControlsOfTypeRecursive<LinkButton>().FirstOrDefault();
                     if ( deleteButton != null )
                     {
@@ -448,11 +448,11 @@ namespace RockWeb.Blocks.Groups
         }
 
         /// <summary>
-        /// Handles the Add event of the gGroups control.
+        /// Handles the Add event of the gSmallGroups control.
         /// </summary>
         /// <param name="sender">The source of the event.</param>
         /// <param name="e">The <see cref="EventArgs" /> instance containing the event data.</param>
-        protected void gGroups_Add( object sender, EventArgs e )
+        protected void gSmallGroups_Add( object sender, EventArgs e )
         {
             if ( GroupListGridMode == GridListGridMode.GroupsPersonMemberOf )
             {
@@ -467,14 +467,14 @@ namespace RockWeb.Blocks.Groups
         }
 
         /// <summary>
-        /// Handles the Edit event of the gGroups control.
+        /// Handles the Edit event of the gSmallGroups control.
         /// </summary>
         /// <param name="sender">The source of the event.</param>
         /// <param name="e">The <see cref="RowEventArgs" /> instance containing the event data.</param>
-        protected void gGroups_Edit( object sender, RowEventArgs e )
+        protected void gSmallGroups_Edit( object sender, RowEventArgs e )
         {
             int groupId;
-            if ( gGroups.DataKeyNames[0] == "GroupMemberId" )
+            if ( gSmallGroups.DataKeyNames[0] == "GroupMemberId" )
             {
                 int groupMemberId = e.RowKeyId;
                 groupId = new GroupMemberService( new RockContext() ).GetSelect( groupMemberId, a => a.GroupId );
@@ -484,7 +484,7 @@ namespace RockWeb.Blocks.Groups
                 groupId = e.RowKeyId;
             }
 
-            NavigateToLinkedPage( "DetailPage", "GroupId", groupId );
+            NavigateToLinkedPage( AttributeKey.DetailPage, "GroupId", groupId );
         }
 
         /// <summary>
@@ -492,7 +492,7 @@ namespace RockWeb.Blocks.Groups
         /// </summary>
         /// <param name="sender">The source of the event.</param>
         /// <param name="e">The <see cref="RowEventArgs" /> instance containing the event data.</param>
-        protected void gGroups_DeleteOrArchive( object sender, RowEventArgs e )
+        protected void gSmallGroups_DeleteOrArchive( object sender, RowEventArgs e )
         {
             var rockContext = new RockContext();
             GroupService groupService = new GroupService( rockContext );
@@ -621,11 +621,11 @@ namespace RockWeb.Blocks.Groups
         }
 
         /// <summary>
-        /// Handles the GridRebind event of the gGroups control.
+        /// Handles the GridRebind event of the gSmallGroups control.
         /// </summary>
         /// <param name="sender">The source of the event.</param>
         /// <param name="e">The <see cref="EventArgs" /> instance containing the event data.</param>
-        private void gGroups_GridRebind( object sender, EventArgs e )
+        private void gSmallGroups_GridRebind( object sender, EventArgs e )
         {
             BindGrid();
         }
@@ -709,6 +709,16 @@ namespace RockWeb.Blocks.Groups
             this.NavigateToCurrentPageReference();
         }
 
+        /// <summary>
+        /// Handles redirection to details page when clicked
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        protected void gSmallGroups_OnRowSelected(object sender, RowEventArgs e)
+        {
+            NavigateToLinkedPage(AttributeKey.DetailPage, "GroupId", e.RowKeyId );
+        }
+
         #endregion
 
         #region Internal Methods
@@ -778,14 +788,14 @@ namespace RockWeb.Blocks.Groups
             var rockContext = new RockContext();
             var groupService = new GroupService( rockContext );
 
-            SortProperty sortProperty = gGroups.SortProperty;
+            SortProperty sortProperty = gSmallGroups.SortProperty;
             if ( sortProperty == null )
             {
                 sortProperty = new SortProperty( new GridViewSortEventArgs( "Name", SortDirection.Ascending ) );
             }
 
             bool onlySecurityGroups = GetAttributeValue( AttributeKey.LimittoSecurityRoleGroups ).AsBoolean();
-            var lElevatedSecurityLevelField = gGroups.ColumnsOfType<RockLiteralField>().Where( a => a.ID == "lElevatedSecurityLevel" ).FirstOrDefault();
+            var lElevatedSecurityLevelField = gSmallGroups.ColumnsOfType<RockLiteralField>().Where( a => a.ID == "lElevatedSecurityLevel" ).FirstOrDefault();
             if ( lElevatedSecurityLevelField != null )
             {
                 lElevatedSecurityLevelField.Visible = onlySecurityGroups && GroupListGridMode == GridListGridMode.GroupList;
@@ -957,16 +967,16 @@ namespace RockWeb.Blocks.Groups
                 }
             }
 
-            gGroups.DataSource = groupList;
-            gGroups.EntityTypeId = GroupListGridMode == GridListGridMode.GroupList ?
+            gSmallGroups.DataSource = groupList;
+            gSmallGroups.EntityTypeId = GroupListGridMode == GridListGridMode.GroupList ?
                 EntityTypeCache.Get<Group>().Id :
                 EntityTypeCache.Get<GroupMember>().Id;
-            gGroups.DataBind();
+            gSmallGroups.DataBind();
 
             // hide the group type column if there's only one type; must come after DataBind()
             if ( _groupTypesCount == 1 )
             {
-                var groupTypeColumn = this.gGroups.ColumnsOfType<RockBoundField>().FirstOrDefault( a => a.DataField == "GroupTypeName" );
+                var groupTypeColumn = this.gSmallGroups.ColumnsOfType<RockBoundField>().FirstOrDefault( a => a.DataField == "GroupTypeName" );
                 groupTypeColumn.Visible = false;
             }
         }
@@ -978,45 +988,17 @@ namespace RockWeb.Blocks.Groups
         private List<int> GetAvailableGroupTypes()
         {
             var groupTypeIds = new List<int>();
+            var smallGroup = GroupTypeCache.Get(Rock.SystemGuid.GroupType.GROUPTYPE_SMALL_GROUP.AsGuid());
 
             var groupTypeService = new GroupTypeService( new RockContext() );
-            var qry = groupTypeService.Queryable().Where( t => t.ShowInGroupList );
 
-            /*
-                04/20/2022 - KA
-
-                The GroupType filtering should use an if/else clause with the IncludeGroupTypes taking priority over the ExcludeGroupTypes
-                (refer to ReminderService.GetReminderEntityTypesByPerson for how it should work). Thus if any GroupTypes are selected as
-                part of the IncludeGroupTypes they should not be excluded even if they are selected as part of the ExcludeGroupTypes. This
-                implementation has been left as it is because it would be too late/risky to change the behavior now since people/admins
-                have already configured it and it is working the way it is working now.
-            */
-
-            List<Guid> includeGroupTypeGuids = GetAttributeValue( "IncludeGroupTypes" ).SplitDelimitedValues().Select( a => Guid.Parse( a ) ).ToList();
-            if ( includeGroupTypeGuids.Count > 0 )
+            if (smallGroup != null)
             {
-                _groupTypesCount = includeGroupTypeGuids.Count;
-                qry = qry.Where( t => includeGroupTypeGuids.Contains( t.Guid ) );
+                _groupTypesCount = 1;
+                return new List<int>{smallGroup.Id};
             }
 
-            List<Guid> excludeGroupTypeGuids = GetAttributeValue( "ExcludeGroupTypes" ).SplitDelimitedValues().Select( a => Guid.Parse( a ) ).ToList();
-            if ( excludeGroupTypeGuids.Count > 0 )
-            {
-                qry = qry.Where( t => !excludeGroupTypeGuids.Contains( t.Guid ) );
-            }
-
-            foreach ( int groupTypeId in qry.Select( t => t.Id ) )
-            {
-                var groupType = GroupTypeCache.Get( groupTypeId );
-                if ( groupType != null && groupType.IsAuthorized( Authorization.VIEW, CurrentPerson ) )
-                {
-                    groupTypeIds.Add( groupTypeId );
-                }
-            }
-
-            groupTypeIds = qry.Select( t => t.Id ).ToList();
-
-            return groupTypeIds;
+            return new List<int>();
         }
 
         /// <summary>

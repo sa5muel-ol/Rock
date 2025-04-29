@@ -313,7 +313,7 @@ namespace Rock.Tests.Integration.Performance.Lava
         {
             // Register the common Rock.Lava filters first, then overwrite with the engine-specific filters.
             engine.RegisterFilters( typeof( global::Rock.Lava.Filters.TemplateFilters ) );
-            engine.RegisterFilters( typeof( global::Rock.Lava.LavaFilters ) );
+            engine.RegisterFilters( typeof( global::Rock.Lava.Filters.LavaFilters ) );
         }
 
         private static void InitializeLavaShortcodes( ILavaEngine engine )

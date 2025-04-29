@@ -277,7 +277,7 @@ namespace Rock.Tests.Lava
         private static void RegisterFilters( ILavaEngine engine )
         {
             engine.RegisterFilters( typeof( global::Rock.Lava.Filters.TemplateFilters ) );
-            engine.RegisterFilters( typeof( global::Rock.Lava.LavaFilters ) );
+            engine.RegisterFilters( typeof( global::Rock.Lava.Filters.LavaFilters ) );
         }
 
         public ILavaEngine GetEngineInstance( Type engineType )

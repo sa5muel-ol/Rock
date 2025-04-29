@@ -14,11 +14,13 @@
 // limitations under the License.
 // </copyright>
 //
+
 using System.Linq;
+
 using Rock.Data;
 using Rock.Reporting;
 
-namespace Rock.Lava
+namespace Rock.Lava.Filters
 {
     internal static partial class LavaFilters
     {

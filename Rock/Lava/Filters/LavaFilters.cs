@@ -14,6 +14,7 @@
 // limitations under the License.
 // </copyright>
 //
+
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -29,15 +30,18 @@ using System.Text.RegularExpressions;
 using System.Web;
 using System.Web.UI;
 using System.Web.UI.HtmlControls;
+
 using Humanizer;
 using Humanizer.Localisation;
+
 using Ical.Net;
+
 using ImageResizer;
 
 using Microsoft.Extensions.Logging;
 
 using Newtonsoft.Json;
-using Rock;
+
 using Rock.Attribute;
 using Rock.Cms.StructuredContent;
 using Rock.Configuration;
@@ -54,9 +58,10 @@ using Rock.Web;
 using Rock.Web.Cache;
 using Rock.Web.UI;
 using Rock.Web.UI.Controls;
+
 using UAParser;
 
-namespace Rock.Lava
+namespace Rock.Lava.Filters
 {
     /// <summary>
     /// Defines filter methods available for use with the Lava library.
@@ -2619,7 +2624,7 @@ namespace Rock.Lava
 
         /// <summary>
         /// Returns a dynamic object from a JSON string. The returned type parameter should be considered 'internal' at this point. It
-        /// is not documented and could be removed if we can use the NestedDictionaryConverter as the default return type. 
+        /// is not documented and could be removed if we can use the NestedDictionaryConverter as the default return type.
         /// See https://www.rockrms.com/page/565#fromjson
         /// </summary>
         /// <param name="input">The input.</param>
@@ -2780,7 +2785,7 @@ namespace Rock.Lava
             }
             else
             {
-                // if the dataObject is neither a single IEntity or a list if IEntity, it is probably from a PersistedDataset 
+                // if the dataObject is neither a single IEntity or a list if IEntity, it is probably from a PersistedDataset
                 if ( isCollection )
                 {
                     IEnumerable<dynamic> dataObjectAsCollection = dataObject as IEnumerable<dynamic>;
@@ -2941,7 +2946,7 @@ namespace Rock.Lava
 
             if ( source is Dictionary<string, object> dictionary )
             {
-                // Try treating it as a dictionary 
+                // Try treating it as a dictionary
                 return LavaAppendWatchesHelper.AppendMediaForDictionary( dictionary, startDate, currentPerson, rockContext );
             }
 
@@ -3010,7 +3015,7 @@ namespace Rock.Lava
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         private enum FollowFilterType
         {
@@ -4140,7 +4145,7 @@ namespace Rock.Lava
             {
                 /* 08-16-2021 MDP
                  * This is only supported for pages that have the PersonalLinks block on it.
-                 * 
+                 *
                  * 02-02-2022 SMC
                  * Added checks to prevent this script from being called if the personalLinks script hasn't been loaded,
                  * so that if this filter is used on a page without the Personal Links block, it will fail safely

@@ -14,15 +14,17 @@
 // limitations under the License.
 // </copyright>
 //
+
 using System;
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
+
 using Rock.Data;
 using Rock.Model;
 using Rock.Web.Cache;
 
-namespace Rock.Lava
+namespace Rock.Lava.Filters
 {
     internal static partial class LavaFilters
     {

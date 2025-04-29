@@ -29,6 +29,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 
 using Microsoft.AspNetCore.Mvc;
+using System.Threading.Tasks;
 
 using Rock.Attribute;
 using Rock.Badge;
@@ -64,6 +65,7 @@ using Rock.Web.UI.Controls;
 using Rock.Workflow;
 
 using Authorization = Rock.Security.Authorization;
+using Group = Rock.Model.Group;
 
 #if WEBFORMS
 using FromBodyAttribute = System.Web.Http.FromBodyAttribute;
@@ -77,6 +79,7 @@ using RoutePrefixAttribute = System.Web.Http.RoutePrefixAttribute;
 
 namespace Rock.Rest.v2
 {
+
     /// <summary>
     /// Provides API endpoints for the Controls controller.
     /// </summary>
@@ -84,6 +87,45 @@ namespace Rock.Rest.v2
     [Rock.SystemGuid.RestControllerGuid( "815B51F0-B552-47FD-8915-C653EEDD5B67" )]
     public class ControlsController : ApiControllerBase
     {
+        #region  Groups
+
+        /// <summary>
+        /// Returns a list of groups - can be filtered to only include active groups
+        /// </summary>
+        /// <param name="isActive"></param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route( "GetListOfGroups" )]
+        public async Task<IActionResult> GetGroupsListAsync(bool? isActive)
+        {
+            var rockContext = new RockContext();
+            var groupsService = new GroupService( rockContext );
+
+            IQueryable < Group > query = groupsService
+                .Queryable()
+                .AsNoTracking();
+
+            if (isActive.HasValue)
+            {
+                query = query.Where(q => q.IsActive == isActive.Value);
+            }
+
+            var groups = await query
+                .OrderByDescending(q => q.ModifiedDateTime)
+                .ThenBy(q => q.CreatedDateTime)
+                .Select(g => new
+                {
+                    g.Guid,
+                    g.Name,
+                    g.IsActive
+                })
+                .ToListAsync();
+
+            return Ok( groups );
+        }
+
+        #endregion
+
         #region Account Picker
 
         /// <summary>

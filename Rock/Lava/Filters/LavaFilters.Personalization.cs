@@ -14,6 +14,7 @@
 // limitations under the License.
 // </copyright>
 //
+
 using System.Collections;
 using System.Collections.Generic;
 using System.Dynamic;
@@ -24,7 +25,7 @@ using Rock.Model;
 using Rock.Utility;
 using Rock.Web.Cache;
 
-namespace Rock.Lava
+namespace Rock.Lava.Filters
 {
     internal static partial class LavaFilters
     {

@@ -40,6 +40,7 @@ using Rock.Data;
 using Rock.Enums.Configuration;
 using Rock.Lava;
 using Rock.Lava.DotLiquid;
+using Rock.Lava.Filters;
 using Rock.Lava.Fluid;
 using Rock.Lava.RockLiquid;
 using Rock.Logging;
@@ -1318,7 +1319,7 @@ WHERE [PQ].[row_number] = 1
         {
             // Register the common Rock.Lava filters first, then overwrite with the engine-specific filters.
             engine.RegisterFilters( typeof( Rock.Lava.Filters.TemplateFilters ) );
-            engine.RegisterFilters( typeof( Rock.Lava.LavaFilters ) );
+            engine.RegisterFilters( typeof( LavaFilters ) );
         }
 
         private static void InitializeLavaShortcodes( ILavaEngine engine )

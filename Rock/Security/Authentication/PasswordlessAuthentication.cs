@@ -24,6 +24,7 @@ using System.Web;
 using Rock.Communication;
 using Rock.Data;
 using Rock.Lava;
+using Rock.Lava.Filters;
 using Rock.Model;
 using Rock.Web.Cache;
 using Rock.Security.Authentication.OneTimePasscode;

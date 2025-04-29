@@ -1,0 +1,93 @@
+<template>
+    <BaseAsyncPicker
+                     v-model="internalValue"
+                     :items="actualItems"
+                     :multiple="props.multiple"
+                     label="Select a Group"
+                     placeholder="Search for a group..." />
+</template>
+
+<script setup lang="ts">
+    import { Guid } from "@Obsidian/Types";
+    import { useHttp } from "@Obsidian/Utility/http";
+    import { defineProps, defineEmits, computed, PropType, ref, watch, onMounted } from "vue";
+
+    /** Interface to match object returned by the endpoint. */
+    interface IGroupListItem {
+        guid: Guid;
+        name: string;
+        isActive: boolean;
+    }
+
+    interface IPickerItem {
+        value: string;
+        text: string;
+    }
+
+    const props = defineProps({
+        /** Uses a boolean to determine whether to return isActive or not. */
+        isActive: {
+            type: Boolean as PropType<boolean>,
+            default: true
+        },
+
+        /** The value of the picker. */
+        /** The value of the picker. This can be a single Guid or an array of Guids. */
+        modelValue: {
+            type: [String, Array] as PropType<Guid | Guid[] | null>,
+            default: null
+        },
+
+        /** Whether to allow multiple selections. */
+        /** If true, the picker will allow multiple selections. */
+        multiple: {
+            type: Boolean as PropType<boolean>,
+            default: true
+        }
+    });
+
+    const emit = defineEmits(["update:modelValue"]);
+
+    const internalValue = ref<Guid | Guid[] | null>(props.modelValue);
+    const loadedItems = ref<IGroupListItem[]>([]);
+    const http = useHttp();
+
+    // keep v-model in sync with internalValue
+    watch(internalValue, v => emit("update:modelValue", v));
+
+    // whenever isActive flips, re‐load
+    watch(() => props.isActive, () => loadGroups());
+
+    // Computed ref for BaseAsyncPicker items
+    const actualItems = computed<IPickerItem[]>(() => {
+        return loadedItems.value.map(item => ({
+            value: item.guid.toString(),
+            text: item.name
+        }));
+    });
+
+    // Fetch list of groups from the API endpoint
+    const loadGroups = async (): Promise<IGroupListItem[]> => {
+        const params = new URLSearchParams();
+
+        if (props.isActive !== undefined) {
+            params.append("isActive", props.isActive.toString());
+        }
+
+        const result = await http.get<IGroupListItem[]>(`/api/v2/Controls/GetListOfGroups?${params.toString()}`);
+
+        if (result.isSuccess && result.data) {
+            loadedItems.value = result.data;
+            return result.data;
+        }
+        else {
+            console.error(result.errorMessage ?? "Unknown error while loading data.");
+            loadedItems.value = [];
+            return [];
+        }
+    };
+
+    // Load groups when the component is mounted
+    onMounted(loadGroups);
+
+</script>

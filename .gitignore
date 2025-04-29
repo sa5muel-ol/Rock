@@ -1,3 +1,10 @@
+# IntelliJ / WebStorm / PhpStorm
+.idea/
+*.iml
+
+# Ignore all PrecompiledWeb output under any localhost port
+PrecompiledWeb/
+
 #file types
 _ReSharper.*
 *.resharper

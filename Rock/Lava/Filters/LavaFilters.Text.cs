@@ -14,7 +14,7 @@
 // limitations under the License.
 // </copyright>
 //
-namespace Rock.Lava
+namespace Rock.Lava.Filters
 {
     /// <summary>
     /// Defines filter methods available for use with the Lava library.
